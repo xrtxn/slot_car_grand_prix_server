@@ -1,0 +1,23 @@
+[package]
+name = "slot_car_grand_prix_server"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+axum = { version = "0.7.5", features = ["macros", "query"] }
+serde = { version = "1.0.201", features = ["derive"] }
+serde-aux = "4.5.0"
+tokio = { version = "1.37.0", features = ["macros", "rt-multi-thread"] }
+tracing-subscriber = "0.3.18"
+tracing = "0.1.40"
+serde_json = "1.0.117"
+flate2 = "1.0"
+base64ct = { version = "1.6.0", features = ["alloc"] }
+axum-login = "0.15.1"
+
+[target.x86_64-unknown-linux-gnu]
+linker = "clang"
+rustflags = ["-C", "link-arg=-fuse-ld=/usr/bin/mold", "-Zcodegen-backend=cranelift"]
+
+[unstable]
+codegen-backend = true
