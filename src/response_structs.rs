@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use crate::gamedata::GameData;
 
 #[derive(Serialize, Deserialize)]
 #[serde(untagged)]
@@ -55,7 +56,7 @@ pub struct PersonalBestResponseData {
     #[serde(rename = "my_best_time")]
     pub my_best_time: i64,
     #[serde(rename = "gameData")]
-    pub game_data: String,
+    pub game_data: GameData,
     #[serde(rename = "lastPlace")]
     pub last_place: u64,
 }
@@ -72,7 +73,7 @@ pub struct HighScoreResponseData {
     #[serde(rename = "optLoginID")]
     pub opt_login_id: i64,
     #[serde(rename = "gameData")]
-    pub game_data: String,
+    pub game_data: GameData,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -94,7 +95,7 @@ pub struct GetMatchedResponseData {
     pub place: i64,
     pub score2: i64,
     #[serde(rename = "gameData")]
-    pub game_data: String,
+    pub game_data: GameData,
     #[serde(rename = "lastPlace")]
     pub last_place: i64,
 }

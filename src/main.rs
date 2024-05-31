@@ -1,12 +1,17 @@
+extern crate core;
+
+mod api;
 mod gamedata;
 mod login;
 mod request_structs;
 mod response_structs;
 mod server_verification;
 
-use crate::gamedata::{getmatched, postscore};
-use crate::gamedata::{gethighscore, getmyscore};
+use crate::api::{gethighscore, getmyscore};
+use crate::api::{getmatched, postscore};
+use crate::gamedata::GameData;
 use crate::login::login;
+use crate::server_verification::compress_string;
 use axum::extract::Query;
 use axum::{
     routing::{get, post},
@@ -34,11 +39,15 @@ async fn main() {
         .route(
             "/LocalTestServer/MongoBoxServlet/postscore",
             post(postscore),
-        )       .route(
+        )
+        .route(
             "/LocalTestServer/MongoBoxServlet/getmatched",
             post(getmatched),
         )
-        .route("/LocalTestServer/MongoBoxServlet/*action", get(unimplemented));
+        .route(
+            "/LocalTestServer/MongoBoxServlet/*action",
+            get(unimplemented),
+        );
 
     // run our app with hyper, listening globally on port 8080
     let listener = tokio::net::TcpListener::bind("127.0.0.1:8080")

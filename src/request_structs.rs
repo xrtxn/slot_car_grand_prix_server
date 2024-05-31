@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 use serde_aux::prelude::deserialize_number_from_string;
+use crate::gamedata::GameData;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct RequestRoot {
@@ -82,7 +83,7 @@ pub struct PostScore {
     pub score2: u64,
     pub score3: u64,
     pub score4: u64,
-    pub gamedata: String,
+    pub gamedata: GameData,
 }
 
 #[derive(Serialize, Deserialize, Debug)]

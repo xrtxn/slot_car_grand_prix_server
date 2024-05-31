@@ -10,10 +10,12 @@ pub async fn login(Json(payload): Json<RequestRoot>) -> Json<ResponseRoot> {
         response: Response {
             message: Some("AllOk".to_string()),
             response_data: ResponseData {
-                data: Data { rows: vec![ApiResponse::LoginResponse(LoginResponseData {
-                    session_id: Some(1),
-                    now: Some("2024-05-28T16:00:06.106601Z".to_string()),
-                })] },
+                data: Data {
+                    rows: vec![ApiResponse::LoginResponse(LoginResponseData {
+                        session_id: Some(1),
+                        now: Some("2024-05-28T16:00:06.106601Z".to_string()),
+                    })],
+                },
             },
         },
     };
