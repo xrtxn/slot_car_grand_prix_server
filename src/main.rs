@@ -5,13 +5,9 @@ mod gamedata;
 mod login;
 mod request_structs;
 mod response_structs;
-mod server_verification;
-
 use crate::api::{gethighscore, getmyscore};
 use crate::api::{getmatched, postscore};
-use crate::gamedata::GameData;
 use crate::login::login;
-use crate::server_verification::compress_string;
 use axum::extract::Query;
 use axum::{
     routing::{get, post},
@@ -59,5 +55,5 @@ async fn main() {
 // This get's called when an as3 function was not rewritten
 async fn unimplemented(Query(params): Query<HashMap<String, String>>) -> &'static str {
     debug!("Function not yet written for: {:?}", params);
-    return "Not yet implemented";
+    "Not yet implemented"
 }

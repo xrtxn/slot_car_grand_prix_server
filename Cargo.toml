@@ -14,10 +14,3 @@ serde_json = "1.0.117"
 flate2 = "1.0"
 base64ct = { version = "1.6.0", features = ["alloc"] }
 axum-login = "0.15.1"
-
-[target.x86_64-unknown-linux-gnu]
-linker = "clang"
-rustflags = ["-C", "link-arg=-fuse-ld=/usr/bin/mold", "-Zcodegen-backend=cranelift"]
-
-[unstable]
-codegen-backend = true

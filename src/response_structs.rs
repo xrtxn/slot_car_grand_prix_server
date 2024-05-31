@@ -4,11 +4,11 @@ use crate::gamedata::GameData;
 #[derive(Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum ApiResponse {
-    LoginResponse(LoginResponseData),
-    PersonalBestResponse(PersonalBestResponseData),
-    HighScoreResponse(HighScoreResponseData),
-    PostScoreResponse(PostScoreResponseData),
-    GetMatchedResponse(GetMatchedResponseData),
+    Login(LoginResponseData),
+    PersonalBest(PersonalBestResponseData),
+    HighScore(HighScoreResponseData),
+    PostScore(PostScoreResponseData),
+    GetMatched(GetMatchedResponseData),
 }
 
 #[derive(Serialize, Deserialize)]
