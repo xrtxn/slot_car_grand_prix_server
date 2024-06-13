@@ -1,6 +1,6 @@
-use serde::{Deserialize, Serialize};
-use serde_aux::prelude::deserialize_number_from_string;
 use crate::gamedata::GameData;
+use serde::{Deserialize, Serialize};
+use serde_aux::prelude::{deserialize_number_from_string, deserialize_string_from_number};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct RequestRoot {
@@ -12,6 +12,8 @@ pub struct RequestRoot {
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(tag = "action")]
 pub enum RequestData {
+    #[serde(rename = "User.Register")]
+    Register(RegisterRequest),
     #[serde(rename = "User.Login")]
     Login(LoginRequestData),
     #[serde(rename = "AppScore.GetPersonalBest")]
@@ -79,10 +81,10 @@ pub struct PostScore {
     pub session_id: String,
     #[serde(rename = "trackid")]
     pub track_id: u8,
-    pub score1: u64,
-    pub score2: u64,
-    pub score3: u64,
-    pub score4: u64,
+    pub score1: u32,
+    pub score2: u32,
+    pub score3: u32,
+    pub score4: u32,
     pub gamedata: GameData,
 }
 
@@ -93,4 +95,29 @@ pub struct GetMatchedData {
     pub track_id: u8,
     #[serde(rename = "sessionid")]
     pub session_id: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct RegisterRequest {
+    #[serde(rename = "appid")]
+    pub app_id: String,
+    pub username: String,
+    #[serde(rename = "userpassword")]
+    pub password: String,
+    #[serde(rename = "useremail")]
+    #[serde(deserialize_with = "deserialize_string_from_number")]
+    pub email: String,
+    #[serde(rename = "optloginid")]
+    pub opt_login_id: i32,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct LoginRequest {
+    pub username: String,
+    pub password: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct RefreshRequest {
+    pub refresh_token: String,
 }

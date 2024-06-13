@@ -2,11 +2,11 @@ use std::fmt;
 use std::io::{Read, Write};
 
 use base64ct::{Base64, Encoding};
-use flate2::Compression;
 use flate2::read::ZlibDecoder;
 use flate2::write::ZlibEncoder;
-use serde::{de, Deserialize, Deserializer, Serialize, Serializer};
+use flate2::Compression;
 use serde::de::{Unexpected, Visitor};
+use serde::{de, Deserialize, Deserializer, Serialize, Serializer};
 
 #[derive(Debug)]
 pub struct GameData {
@@ -162,64 +162,69 @@ impl<'de> Deserialize<'de> for GameData {
 
 impl Serialize for CarBody {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-        where
-            S: Serializer,
+    where
+        S: Serializer,
     {
-        let value = match self {
-            CarBody::Standard => 0,
-            CarBody::HotRod => 1,
-            CarBody::Mini => 2,
-            CarBody::SurfMobile => 3,
-            CarBody::SuperSport => 4,
-        };
-        serializer.serialize_u64(value)
+        serializer.serialize_i16(carbody_serialize(self))
     }
 }
 
-// Implement Serialize for CarColor
+pub fn carbody_serialize(car_body: &CarBody) -> i16 {
+    match car_body {
+        CarBody::Standard => 0,
+        CarBody::HotRod => 1,
+        CarBody::Mini => 2,
+        CarBody::SurfMobile => 3,
+        CarBody::SuperSport => 4,
+    }
+}
+
 impl Serialize for CarColor {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-        where
-            S: Serializer,
+    where
+        S: Serializer,
     {
-        let value = match self {
-            CarColor::Red => 0,
-            CarColor::Orange => 1,
-            CarColor::Yellow => 2,
-            CarColor::LightGreen => 3,
-            CarColor::Green => 4,
-            CarColor::LightBlue => 5,
-            CarColor::Blue => 6,
-            CarColor::Purple => 7,
-            CarColor::Pink => 8,
-            CarColor::Black => 9,
-        };
-        serializer.serialize_u64(value)
+        serializer.serialize_i16(carcolor_serialize(self))
+    }
+}
+
+pub fn carcolor_serialize(car_color: &CarColor) -> i16 {
+    match car_color {
+        CarColor::Red => 0,
+        CarColor::Orange => 1,
+        CarColor::Yellow => 2,
+        CarColor::LightGreen => 3,
+        CarColor::Green => 4,
+        CarColor::LightBlue => 5,
+        CarColor::Blue => 6,
+        CarColor::Purple => 7,
+        CarColor::Pink => 8,
+        CarColor::Black => 9,
     }
 }
 
 impl Serialize for GameData {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-        where
-            S: Serializer,
+    where
+        S: Serializer,
     {
-        // Step 1: Create a string representation of the struct
-        let data_str = format!("{},{},{},{}",
-                               self.version,
-                               serde_json::to_string(&self.car_body).map_err(serde::ser::Error::custom)?,
-                               serde_json::to_string(&self.car_color).map_err(serde::ser::Error::custom)?,
-                               self.data
+        let data_str = format!(
+            "{},{},{},{}",
+            self.version,
+            serde_json::to_string(&self.car_body).map_err(serde::ser::Error::custom)?,
+            serde_json::to_string(&self.car_color).map_err(serde::ser::Error::custom)?,
+            self.data
         );
-
-        // Step 2: Compress the string using zlib
-        let mut encoder = ZlibEncoder::new(Vec::new(), Compression::default());
-        encoder.write_all(data_str.as_bytes()).map_err(serde::ser::Error::custom)?;
-        let compressed_bytes = encoder.finish().map_err(serde::ser::Error::custom)?;
-
-        // Step 3: Encode the compressed bytes to base64
-        let base64_str = Base64::encode_string(&compressed_bytes);
-
-        // Step 4: Serialize the base64 string
-        serializer.serialize_str(&base64_str)
+        let encoded = &string_compress(&data_str).map_err(serde::ser::Error::custom)?;
+        serializer.serialize_str(encoded)
     }
+}
+
+//todo err handling
+pub fn string_compress(data: &str) -> Result<String, anyhow::Error> {
+    let mut encoder = ZlibEncoder::new(Vec::new(), Compression::default());
+    encoder.write_all(data.as_bytes())?;
+    let compressed_bytes = encoder.finish()?;
+
+    Ok(Base64::encode_string(&compressed_bytes))
 }
