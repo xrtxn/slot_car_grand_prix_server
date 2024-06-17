@@ -1,9 +1,9 @@
 use axum::http::StatusCode;
 use axum::response::IntoResponse;
-use axum::{debug_handler, Extension, Json};
+use axum::{Extension, Json};
 use axum_jwt_ware::{
     auth_token_decode, auth_token_encode, Claims, DecodingContext, DecodingKey, EncodingContext,
-    EncodingKey, Header, RefreshBody,
+    EncodingKey, Header,
 };
 use chrono::{Duration, Utc};
 use password_auth::verify_password;
@@ -230,9 +230,8 @@ pub async fn refresh_token(
     .await
     {
         Ok(mut claims) => {
-            match new_claims {
-                Some(new) => claims.claims = new,
-                None => {}
+            if let Some(new) = new_claims {
+                claims.claims = new
             }
             claims.claims.exp = (Utc::now() + Duration::hours(48)).timestamp();
             match auth_token_encode(

@@ -1,0 +1,2 @@
+ALTER TABLE data.score
+    ADD datetime INTEGER DEFAULT 0 NOT NULL;

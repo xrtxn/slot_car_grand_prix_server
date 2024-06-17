@@ -1,3 +1,4 @@
+use anyhow::anyhow;
 use std::fmt;
 use std::io::{Read, Write};
 
@@ -220,11 +221,24 @@ impl Serialize for GameData {
     }
 }
 
-//todo err handling
 pub fn string_compress(data: &str) -> Result<String, anyhow::Error> {
     let mut encoder = ZlibEncoder::new(Vec::new(), Compression::default());
     encoder.write_all(data.as_bytes())?;
     let compressed_bytes = encoder.finish()?;
 
     Ok(Base64::encode_string(&compressed_bytes))
+}
+
+pub fn data_field_decompress(data: &str) -> Result<String, anyhow::Error> {
+    //for some reason rust's base64 crate doesn't read \n properly
+    let base64_str: String = data.replace("\n", "");
+
+    let decoded_bytes = Base64::decode_vec(&base64_str)
+        .map_err(|e| anyhow!("Failed to decompress field: {}", e))?;
+
+    let mut decoder = ZlibDecoder::new(&decoded_bytes[..]);
+    let mut decompressed_bytes = Vec::new();
+    decoder.read_to_end(&mut decompressed_bytes)?;
+
+    Ok(String::from_utf8(decompressed_bytes)?)
 }

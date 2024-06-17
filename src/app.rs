@@ -18,7 +18,6 @@ impl App {
         let db = PgPool::connect(&dotenvy::var("DATABASE_URL").expect("DATABASE_URL not defined!"))
             .await?;
         sqlx::migrate!().run(&db).await?;
-
         Ok(Self { db })
     }
 
@@ -26,11 +25,10 @@ impl App {
         let app = Router::new()
             .route("/LocalTestServer/MongoBoxServlet/refresh", post(refresh))
             .route("/LocalTestServer/MongoBoxServlet/login", post(full_login))
-            .layer(Extension(self.db.clone()))
             .route("/LocalTestServer/MongoBoxServlet/register", post(register))
             .route(
                 "/LocalTestServer/MongoBoxServlet/getmyscore",
-                post(getmyscore),
+                post(getmyscore).layer(middleware::from_fn(jwt_access_middleware)),
             )
             .route(
                 "/LocalTestServer/MongoBoxServlet/gethighscore",
@@ -40,11 +38,11 @@ impl App {
                 "/LocalTestServer/MongoBoxServlet/postscore",
                 post(postscore).layer(middleware::from_fn(jwt_access_middleware)),
             )
-            .layer(Extension(self.db.clone()))
             .route(
                 "/LocalTestServer/MongoBoxServlet/getmatched",
                 post(getmatched),
-            );
+            )
+            .layer(Extension(self.db.clone()));
 
         let listener = tokio::net::TcpListener::bind("127.0.0.1:8080")
             .await
